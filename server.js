@@ -4,9 +4,11 @@ const axios = require('axios');
 const modelList = require('./models/newsModel');
 const app = express();
 const port = 3000
-
+require('dotenv').config();
 app.use(express.json())
 
+console.log(process.env.API_KEY
+    )
 app.get('/', (req, res) => {
     res.send('Hello world');
 })
@@ -61,7 +63,7 @@ app.get('/news/:category', async (req, res) => {
 
 async function fetchTopHeadlines() {
     try {
-        const response = await axios.get('https://newsapi.org/v2/everything?q=Top%20Headlines&apiKey=99e2f21700fb424fb718ee7260300963')
+        const response = await axios.get(`https://newsapi.org/v2/everything?q=Top%20Headlines&apiKey=${process.env.API_KEY}`)
         const newsArticles = response.data.articles
 
         const TopHeadlines = modelList[0]
@@ -81,7 +83,7 @@ async function fetchTopHeadlines() {
 }
 async function fetchDataFromApiCategoryWise(category) {
     try {
-        const response = await axios.get(`https://newsapi.org/v2/everything?q=${category.modelName}&apiKey=99e2f21700fb424fb718ee7260300963`)
+        const response = await axios.get(`https://newsapi.org/v2/everything?q=${category.modelName}&apiKey=${process.env.API_KEY}`)
         const newsArticles = response.data.articles
 
         for (const article in newsArticles) {
