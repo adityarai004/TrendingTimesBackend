@@ -7,55 +7,59 @@ const port = 3000
 require('dotenv').config();
 app.use(express.json())
 
-console.log(process.env.API_KEY
-    )
-app.get('/', (req, res) => {
-    res.send('Hello world');
-})
-
 app.get('/news/:category', async (req, res) => {
     const { category } = req.params
+    const { page = 1, limit = 10 } = req.query
 
+    let newsModel
+    switch (category) {
+        case 'top_headlines':
+            newsModel = modelList[0]
+            break;
+        case 'business':
+            newsModel = modelList[1]
+            break;
+        case 'science':
+            newsModel = modelList[2]
+            break;
+        case 'politics':
+            newsModel = modelList[3]
+            break;
+        case 'health':
+            newsModel = modelList[4]
+            break;
+        case 'education':
+            newsModel = modelList[5]
+            break;
+        case 'technology':
+            newsModel = modelList[6]
+            break;
+        case 'entertainment':
+            newsModel = modelList[7]
+            break;
+        case 'opinion':
+            newsModel = modelList[8]
+            break;
+        case 'sports':
+            newsModel = modelList[9]
+            break;
+        default:
+            newsModel = modelList[0]
+            break;
+    }
     try {
-        let newsModel
-        switch (category) {
-            case 'top_headlines':
-                newsModel = modelList[0]
-                break;
-            case 'business':
-                newsModel = modelList[1]
-                break;
-            case 'science':
-                newsModel = modelList[2]
-                break;
-            case 'politics':
-                newsModel = modelList[3]
-                break;
-            case 'health':
-                newsModel = modelList[4]
-                break;
-            case 'education':
-                newsModel = modelList[5]
-                break;
-            case 'technology':
-                newsModel = modelList[6]
-                break;
-            case 'entertainment':
-                newsModel = modelList[7]
-                break;
-            case 'opinion':
-                newsModel = modelList[8]
-                break;
-            case 'sports':
-                newsModel = modelList[9]
-                break;
-            default:
-                newsModel = modelList[0]
-                break;
-        }
+        const totalResults = await newsModel.countDocuments();
+        const totalPages = Math.ceil(totalResults / limit)
         const news = await newsModel.find({}, {'source._id': 0, __v: 0 })
-            .sort({ publishedAt: -1 });
-        res.status(200).json(news);
+            .sort({ publishedAt: -1 })
+            .limit(limit * 1)
+            .skip((page-1) * limit);
+        res.status(200).json({
+            currentPage: parseInt(page),
+            totalPages: totalPages,
+            totalResults: totalResults,
+            articles: news
+        });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -63,7 +67,7 @@ app.get('/news/:category', async (req, res) => {
 
 async function fetchTopHeadlines() {
     try {
-        const response = await axios.get(`https://newsapi.org/v2/everything?q=Top%20Headlines&apiKey=${process.env.API_KEY}`)
+        const response = await axios.get(`https://newsapi.org/v2/everything?q=Top%20Headlines&sortBy=publishedAt&apiKey=${process.env.API_KEY}`)
         const newsArticles = response.data.articles
 
         const TopHeadlines = modelList[0]
@@ -83,7 +87,7 @@ async function fetchTopHeadlines() {
 }
 async function fetchDataFromApiCategoryWise(category) {
     try {
-        const response = await axios.get(`https://newsapi.org/v2/everything?q=${category.modelName}&apiKey=${process.env.API_KEY}`)
+        const response = await axios.get(`https://newsapi.org/v2/everything?q=${category.modelName}&sortBy=publishedAt&apiKey=${process.env.API_KEY}`)
         const newsArticles = response.data.articles
 
         for (const article in newsArticles) {
