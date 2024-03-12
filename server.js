@@ -154,9 +154,7 @@ mongoose.connect('mongodb+srv://admin:aditya51643@trendingtimesapi.l72ul6k.mongo
 
 const cron = require('node-cron')
 
-const schedule = '0 * * * *'
-
-cron.schedule(schedule, () => {
+cron.schedule(process.env.SCHEDULE, () => {
     modelList.forEach(category => {
         fetchDataFromApiCategoryWise(category)
     });
