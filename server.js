@@ -72,6 +72,7 @@ app.get('/search/:keyword', async (req, res) => {
 
         const searchPromises = modelList.map(async Model => {
             return Model.find({ title: { $regex: new RegExp(keyword, 'i') } }, { 'source._id': 0, __v: 0 })
+                .sort({publishedAt: -1})
                 .skip((page - 1) * limit)
                 .limit(limit)
         });
