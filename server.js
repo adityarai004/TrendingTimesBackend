@@ -49,19 +49,43 @@ app.get('/news/:category', async (req, res) => {
     }
     try {
         const totalResults = await newsModel.countDocuments();
-        const totalPages = Math.ceil(totalResults / limit)
-        const news = await newsModel.find({}, {'source._id': 0, __v: 0 })
+        const news = await newsModel.find({}, { 'source._id': 0, __v: 0 })
             .sort({ publishedAt: -1 })
             .limit(limit * 1)
-            .skip((page-1) * limit);
+            .skip((page - 1) * limit);
+
         res.status(200).json({
             currentPage: parseInt(page),
-            totalPages: totalPages,
+            totalPages: Math.ceil(totalResults / limit),
             totalResults: totalResults,
             articles: news
         });
     } catch (error) {
         res.status(500).json({ message: error.message });
+    }
+})
+
+app.get('/search/:keyword', async (req, res) => {
+    const { page = 1, limit = 10 } = req.query
+    const keyword = req.params.keyword
+    try {
+
+        const searchPromises = modelList.map(async Model => {
+            return Model.find({ title: { $regex: new RegExp(keyword, 'i') } }, { 'source._id': 0, __v: 0 })
+                .skip((page - 1) * limit)
+                .limit(limit)
+        });
+
+        const results = await Promise.all(searchPromises);
+        const flattenedResults = results.flat();
+
+        res.status(200).json({
+            articles: flattenedResults
+        });
+    }
+    catch (error) {
+        console.log(`error ${error} occurred`)
+        res.status(500).json({ message: "Internal server error." })
     }
 })
 
@@ -125,7 +149,7 @@ mongoose.connect('mongodb+srv://admin:aditya51643@trendingtimesapi.l72ul6k.mongo
     }).catch((error) => {
         console.log(error)
     }
-)
+    )
 
 const cron = require('node-cron')
 
