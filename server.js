@@ -2,10 +2,21 @@ const express = require('express');
 const mongoose = require('mongoose');
 const axios = require('axios');
 const modelList = require('./models/newsModel');
-const app = express();
+const connectDB = require('./controllers/db');
+const authRoutes = require('./routes/auth');
+const userRoutes = require('./routes/user');
 const port = 3000
 require('dotenv').config();
-app.use(express.json())
+
+const app = express();
+
+app.use(express.json());
+connectDB();
+app.use('/auth', authRoutes);
+
+// Define user routes
+app.use('/user', userRoutes);
+
 
 app.get('/news/:category', async (req, res) => {
     const { category } = req.params
@@ -141,22 +152,24 @@ app.post('/news', async (req, res) => {
     }
 })
 
-mongoose.connect('mongodb+srv://admin:aditya51643@trendingtimesapi.l72ul6k.mongodb.net/News-API?retryWrites=true&w=majority&appName=TrendingTimesAPI')
-    .then(() => {
-        console.log('connected to mongodb')
-        app.listen(port, () => {
-            console.log(`Example app is listening on port ${port}`)
-        })
-    }).catch((error) => {
-        console.log(error)
-    }
-    )
+// mongoose.connect('')
+//     .then(() => {
+//         console.log('connected to mongodb')
+        
+//     }).catch((error) => {
+//         console.log(error)
+//     }
+//     )
 
-const cron = require('node-cron')
+app.listen(port, () => {
+    console.log(`Example app is listening on port ${port}`)
+});
 
-cron.schedule(process.env.SCHEDULE, () => {
-    modelList.forEach(category => {
-        fetchDataFromApiCategoryWise(category)
-    });
-    fetchTopHeadlines();
-})
+// const cron = require('node-cron')
+
+// cron.schedule(process.env.SCHEDULE, () => {
+//     modelList.forEach(category => {
+//         fetchDataFromApiCategoryWise(category)
+//     });
+//     fetchTopHeadlines();
+// })
