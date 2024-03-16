@@ -1,11 +1,12 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const {log} = require('mercedlogger')
 const axios = require('axios');
 const modelList = require('./models/newsModel');
 const connectDB = require('./controllers/db');
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
-const port = 3000
+const PORT = 3000
 require('dotenv').config();
 
 const app = express();
@@ -141,35 +142,13 @@ async function fetchDataFromApiCategoryWise(category) {
     }
 }
 
+app.listen(PORT, () => log.green("SERVER STATUS", `Listening on port ${PORT}`))
 
-app.post('/news', async (req, res) => {
-    try {
-        const news = await News.create(req.body)
-        res.status(200).json(news)
-    } catch (error) {
-        console.log(error.message);
-        res.status(500).json({ message: error.message })
-    }
+const cron = require('node-cron')
+
+cron.schedule(process.env.SCHEDULE, () => {
+    modelList.forEach(category => {
+        fetchDataFromApiCategoryWise(category)
+    });
+    fetchTopHeadlines();
 })
-
-// mongoose.connect('')
-//     .then(() => {
-//         console.log('connected to mongodb')
-        
-//     }).catch((error) => {
-//         console.log(error)
-//     }
-//     )
-
-app.listen(port, () => {
-    console.log(`Example app is listening on port ${port}`)
-});
-
-// const cron = require('node-cron')
-
-// cron.schedule(process.env.SCHEDULE, () => {
-//     modelList.forEach(category => {
-//         fetchDataFromApiCategoryWise(category)
-//     });
-//     fetchTopHeadlines();
-// })
