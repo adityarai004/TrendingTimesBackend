@@ -152,24 +152,16 @@ app.post('/news', async (req, res) => {
     }
 })
 
-// mongoose.connect('')
-//     .then(() => {
-//         console.log('connected to mongodb')
-        
-//     }).catch((error) => {
-//         console.log(error)
-//     }
-//     )
 
 app.listen(port, () => {
     console.log(`Example app is listening on port ${port}`)
 });
 
-// const cron = require('node-cron')
+const cron = require('node-cron')
 
-// cron.schedule(process.env.SCHEDULE, () => {
-//     modelList.forEach(category => {
-//         fetchDataFromApiCategoryWise(category)
-//     });
-//     fetchTopHeadlines();
-// })
+cron.schedule(process.env.SCHEDULE, () => {
+    modelList.forEach(category => {
+        fetchDataFromApiCategoryWise(category)
+    });
+    fetchTopHeadlines();
+})
