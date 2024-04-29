@@ -75,4 +75,4 @@ const modelList = [
     OpinionNews,
     SportsNews
 ]
-module.exports = modelList;
+module.exports = modelList,newsSchema;
