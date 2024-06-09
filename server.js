@@ -154,9 +154,9 @@ app.post('/news', async (req, res) => {
 })
 
 
-app.listen(port, () => {
-    console.log(`Example app is listening on port ${port}`)
-});
+// app.listen(port, () => {
+//     console.log(`Example app is listening on port ${port}`)
+// });
 
 
 cron.schedule(process.env.SCHEDULE, () => {
