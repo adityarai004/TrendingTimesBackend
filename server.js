@@ -5,6 +5,7 @@ const modelList = require('./models/newsModel');
 const connectDB = require('./controllers/db');
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
+const cron = require('node-cron')
 const port = 3000
 require('dotenv').config();
 
@@ -157,7 +158,6 @@ app.listen(port, () => {
     console.log(`Example app is listening on port ${port}`)
 });
 
-const cron = require('node-cron')
 
 cron.schedule(process.env.SCHEDULE, () => {
     modelList.forEach(category => {
