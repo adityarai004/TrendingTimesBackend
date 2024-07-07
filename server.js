@@ -84,7 +84,7 @@ app.get('/search/:keyword', async (req, res) => {
 
         const searchPromises = modelList.map(async Model => {
             return Model.find({ title: { $regex: new RegExp(keyword, 'i') } }, { 'source._id': 0, __v: 0 })
-                .sort({publishedAt: -1})
+                .sort({ publishedAt: -1 })
                 .skip((page - 1) * limit)
                 .limit(limit)
         });
@@ -154,9 +154,9 @@ app.post('/news', async (req, res) => {
 })
 
 
-// app.listen(port, () => {
-//     console.log(`Example app is listening on port ${port}`)
-// });
+app.listen(port, () => {
+    console.log(`Example app is listening on port ${port}`)
+});
 
 
 cron.schedule(process.env.SCHEDULE, () => {
