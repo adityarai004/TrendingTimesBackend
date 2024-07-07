@@ -134,7 +134,7 @@ async function fetchDataFromApiCategoryWise(category) {
                 await newNews.save()
             }
             else {
-                console.log('Skipping duplicate news article:', article);
+                console.log('Skipping duplicate ',category,' news article:', article);
             }
         }
     } catch (error) {
