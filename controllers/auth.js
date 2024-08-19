@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
 const register = async (req, res, next) => {
-    const { email, password } = req.body;
+    const { email, password, name, dob, gender } = req.body;
 
     try {
         const existingUser = await User.findOne({ email });
@@ -10,12 +10,16 @@ const register = async (req, res, next) => {
             return res.status(400).json({ success: false, message: 'Email already exists' });
         }
 
-        const newUser = new User({ email, password });
+        const newUser = new User({ email, password, name, gender, dob });
         const savedUser = await newUser.save();
-
-        res.status(201).json({ success: true, message: 'Registration successful' });
+        if (savedUser) {
+            res.status(201).json({ success: true, message: 'Registration successful' });
+        }
+        else {
+            res.status(402).json({ success: false, message: "Something went wrong while creating the user" });
+        }
     } catch (error) {
-        next(error)
+        res.status(402).json({ success: false, message: `Error ${error}, occurred` });
     }
 };
 
@@ -34,7 +38,7 @@ const login = async (req, res, next) => {
         }
 
         const token = jwt.sign({ userId: user._id }, 'secretkey', {
-            expiresIn: '1 hour'
+            expiresIn: '24 hour'
         });
         res.json({ success: true, message: token });
     }
