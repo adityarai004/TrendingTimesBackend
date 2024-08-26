@@ -26,5 +26,5 @@ app.use("/news", newsRoutes);
 startCronJobs();
 
 app.listen(process.env.PORT, () => {
-  console.log(`Server Started on port ${port}`);
+  console.log(`Server Started on port ${process.env.PORT}`);
 });
